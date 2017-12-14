@@ -6,6 +6,11 @@ for Rust libraries in [RFC #1105](https://github.com/rust-lang/rfcs/blob/master/
 
 ## Unreleased
 
+### Added
+
+* `helper_types` now contains a type for every method defined in
+  `expression_methods`, and ever function in `dsl`.
+
 ### Fixed
 
 * Executing select statements on SQLite will no longer panic when the database
@@ -13,6 +18,10 @@ for Rust libraries in [RFC #1105](https://github.com/rust-lang/rfcs/blob/master/
 
 * `table!`s which use the `Datetime` type with MySQL will now compile correctly,
   even without the `chrono` feature enabled.
+
+### Changed
+
+* `helper_types::Not` is now `helper_types::not`
 
 ## [1.0.0-beta1] - 2017-12-04
 

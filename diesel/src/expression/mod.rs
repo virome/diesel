@@ -1,14 +1,15 @@
-//! AST types representing various typed SQL expressions. Almost all types
-//! implement either [`Expression`](/diesel/expression/trait.Expression.html) or
-//! [`AsExpression`](/diesel/expression/trait.AsExpression.html).
+//! AST types representing various typed SQL expressions.
+//!
+//! Almost all types implement either [`Expression`](trait.Expression.html) or
+//! [`AsExpression`](trait.AsExpression.html).
 //!
 //! The most common expression to work with is a
 //! [`Column`](../query_source/trait.Column.html). There are various methods
 //! that you can call on these, found in
-//! [`expression_methods`](expression_methods/index.html). You can also call
-//! numeric operators on types which have been passed to
-//! [`operator_allowed!`](../macro.operator_allowed.html) or
-//! [`numeric_expr!`](../macro.numeric_expr.html).
+//! [`expression_methods`](../expression_methods/index.html).
+//!
+//! You can also use numeric operators such as `+` on expressions of the
+//! appropriate type.
 //!
 //! Any primitive which implements [`ToSql`](../types/trait.ToSql.html) will
 //! also implement [`AsExpression`](trait.AsExpression.html), allowing it to be
@@ -32,7 +33,7 @@ pub mod exists;
 pub mod functions;
 #[doc(hidden)]
 pub mod grouped;
-#[macro_use]
+#[doc(hidden)]
 pub mod helper_types;
 mod not;
 #[doc(hidden)]
