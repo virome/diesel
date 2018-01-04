@@ -48,7 +48,27 @@ table! {
 }
 
 #[test]
-fn test_count_max() {
+fn test_min() {
+    use self::numbers::columns::*;
+    use self::numbers::table as numbers;
+
+    let connection = connection();
+    connection
+        .execute("INSERT INTO numbers (n) VALUES (2), (1), (5)")
+        .unwrap();
+    let source = numbers.select(min(n));
+
+    assert_eq!(Ok(Some(1)), source.first(&connection));
+    connection
+        .execute("DELETE FROM numbers WHERE n = 1")
+        .unwrap();
+    assert_eq!(Ok(Some(2)), source.first(&connection));
+    connection.execute("DELETE FROM numbers").unwrap();
+    assert_eq!(Ok(None::<i32>), source.first(&connection));
+}
+
+#[test]
+fn test_max() {
     use self::numbers::columns::*;
     use self::numbers::table as numbers;
 
@@ -138,26 +158,6 @@ fn max_accepts_all_numeric_string_and_date_types() {
 
     let _ = users.select(max(arbitrary::<types::Nullable<types::VarChar>>()));
     let _ = users.select(max(arbitrary::<types::Nullable<types::Text>>()));
-}
-
-#[test]
-fn test_min() {
-    use self::numbers::columns::*;
-    use self::numbers::table as numbers;
-
-    let connection = connection();
-    connection
-        .execute("INSERT INTO numbers (n) VALUES (2), (1), (5)")
-        .unwrap();
-    let source = numbers.select(min(n));
-
-    assert_eq!(Ok(Some(1)), source.first(&connection));
-    connection
-        .execute("DELETE FROM numbers WHERE n = 1")
-        .unwrap();
-    assert_eq!(Ok(Some(2)), source.first(&connection));
-    connection.execute("DELETE FROM numbers").unwrap();
-    assert_eq!(Ok(None::<i32>), source.first(&connection));
 }
 
 sql_function!(coalesce, coalesce_t, (x: types::Nullable<types::VarChar>, y: types::VarChar) -> types::VarChar);
