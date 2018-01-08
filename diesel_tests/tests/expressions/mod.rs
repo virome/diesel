@@ -87,6 +87,53 @@ fn test_max() {
     assert_eq!(Ok(None::<i32>), source.first(&connection));
 }
 
+#[cfg(feature = "postgres")]
+table! {
+    number_arrays (na) {
+        na -> Array<Integer>,
+    }
+}
+
+#[test]
+#[cfg(feature = "postgres")]
+fn test_min_max_of_array() {
+    use self::number_arrays::dsl::*;
+
+    let connection = connection();
+    connection
+        .execute("CREATE TABLE number_arrays ( na INTEGER[] PRIMARY KEY )")
+        .unwrap();
+
+    connection
+       .execute("INSERT INTO number_arrays (na) VALUES ('{1, 1, 100}'), ('{1, 5, 5}'), ('{5, 0}')")
+       .unwrap();
+
+    let max_query = number_arrays.select(max(na));
+    let min_query = number_arrays.select(min(na));
+    assert_eq!(Ok(Some(vec![5, 0])), max_query.first(&connection));
+    assert_eq!(Ok(Some(vec![1, 1, 100])), min_query.first(&connection));
+
+    delete(number_arrays.filter(na.eq(vec![5, 0])))
+        .execute(&connection)
+        .unwrap();
+    assert_eq!(Ok(Some(vec![1, 5, 5])), max_query.first(&connection));
+    assert_eq!(Ok(Some(vec![1, 1, 100])), min_query.first(&connection));
+
+    delete(number_arrays.filter(na.eq(vec![1, 1, 100])))
+        .execute(&connection)
+        .unwrap();
+    assert_eq!(Ok(Some(vec![1, 5, 5])), max_query.first(&connection));
+    assert_eq!(Ok(Some(vec![1, 5, 5])), min_query.first(&connection));
+
+    delete(number_arrays)
+        .execute(&connection)
+        .unwrap();
+    assert_eq!(Ok(None::<Vec<i32>>), max_query.first(&connection));
+    assert_eq!(Ok(None::<Vec<i32>>), min_query.first(&connection));
+
+    connection.execute("DROP TABLE number_arrays").unwrap();
+}
+
 #[test]
 fn max_returns_same_type_as_expression_being_maximized() {
     let connection = connection();
